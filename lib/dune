@@ -1,0 +1,2 @@
+(library
+ (name kmeans_ocaml))

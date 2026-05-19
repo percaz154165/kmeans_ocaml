@@ -1,0 +1,4 @@
+(executable
+ (public_name kmeans_ocaml)
+ (name main)
+ (libraries kmeans_ocaml))
