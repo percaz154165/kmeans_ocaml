@@ -1,15 +1,17 @@
 type t = {
-  mutable centroid : Point.t ;
-  mutable points : Point.t array;
+  mutable centroid : Point.t;
+  mutable points : Point.t list;
+  mutable converged : bool;
 }
 
 let create centroid = {
   centroid;
-  points = [||];
+  points = [];
+  converged = false;
 }
 
 let addPoint cluster point =
-  cluster.points <- Array.append cluster.points [|point|]
+  cluster.points <- point :: cluster.points
 
 let recalcCentroid cluster =
   let sum =
@@ -17,17 +19,28 @@ let recalcCentroid cluster =
       (Point.getDimension cluster.centroid)
       0.0
   in
-  let n = Array.length cluster.points in
+
+  let n = List.length cluster.points in
+
   if n > 0 then begin
-    for i = 0 to n - 1 do
+
+    List.iter (fun point ->
       Array.iteri (fun j value ->
         sum.(j) <- sum.(j) +. value
-      ) cluster.points.(i)
-    done;
-    let centroid =
+      ) point
+    ) cluster.points;
+
+    let centroidNew =
       Array.map
-      (fun x -> x /. float_of_int n)
-      sum
+        (fun x -> x /. float_of_int n)
+        sum
     in
-    cluster.centroid <- centroid
+
+    cluster.converged <-
+      Point.distance
+        cluster.centroid
+        centroidNew
+      < 1e-4;
+
+    cluster.centroid <- centroidNew
   end
