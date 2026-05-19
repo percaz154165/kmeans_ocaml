@@ -1,4 +1,4 @@
-type point = float array
+type t = float array
 let create coords = Array.copy coords
 let getDimension point = Array.length point
 let normalize point mins maxs =
