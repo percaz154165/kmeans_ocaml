@@ -3,18 +3,17 @@ let initClusters points seed k =
   let clusters = Array.make k (Cluster.create [||]) in
 
   Random.init seed;
+  let oldIdx = ref (-1) in
 
   for i = 0 to k - 1 do
-    let idx = Random.int numPoints in
-    let centroid = points.(idx) in
+    let idx = ref (Random.int numPoints) in
+    while !idx = !oldIdx do
+      (* Evitar seleccionar el mismo punto como centroide *)
+      idx := Random.int numPoints;
+    done;
 
-    Printf.printf
-      "Centroid %d: %s\n"
-      (i + 1)
-      (centroid
-      |> Array.to_list
-      |> List.map string_of_float
-      |> String.concat ", ");
+    oldIdx := !idx;
+    let centroid = points.(!idx) in
 
     clusters.(i) <- Cluster.create centroid
   done;
@@ -23,7 +22,7 @@ let initClusters points seed k =
 
 
 let cleanClusters clusters =
-  Array.iter (fun cluster ->
+  Array.iter (fun ((cluster : Cluster.t) : Cluster.t) ->
     cluster.points <- []
   ) clusters
 
@@ -35,14 +34,18 @@ let assignPointsToClusters points clusters =
 
     let closestCluster = ref 0 in
 
+    let firstCluster : Cluster.t =
+      clusters.(0)
+    in
+
     let closestDistance =
-      ref (Point.distance point clusters.(0).centroid)
+      ref (Point.euclideanDistance point firstCluster.centroid)
     in
 
     for j = 1 to Array.length clusters - 1 do
 
       let distance =
-        Point.distance
+        Point.euclideanDistance
           point
           clusters.(j).centroid
       in
@@ -66,6 +69,6 @@ let updateCentroids clusters =
 
 
 let hasNotConvergedAll clusters =
-  Array.exists (fun cluster ->
+  Array.exists (fun (cluster : Cluster.t) ->
     not cluster.converged
   ) clusters

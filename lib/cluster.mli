@@ -1,4 +1,4 @@
-type cluster = { mutable centroid : point.t; mutable points : point.t list; mutable converged : bool }
-val create : point.t -> t
-val addPoint: t -> point.t -> unit
+type t = { mutable centroid : Point.t; mutable points : Point.t list; mutable converged : bool }
+val create : Point.t -> t
+val addPoint: t -> Point.t -> unit
 val recalcCentroid: t -> unit

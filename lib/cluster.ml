@@ -37,7 +37,7 @@ let recalcCentroid cluster =
     in
 
     cluster.converged <-
-      Point.distance
+      Point.euclideanDistance
         cluster.centroid
         centroidNew
       < 1e-4;
