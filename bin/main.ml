@@ -1,46 +1,57 @@
 open Kmeans_ocaml
 
+let time f =
+  let start = Unix.gettimeofday () in
+  let res = f () in
+  let stop = Unix.gettimeofday () in
+  (res, stop -. start)
+
 let () =
+  let seed = 42 in
+  let k = 6 in
+  let maxIters = 10000 in
 
-  let points = CsvReader.readDataset "data/dataset.csv" in
+  print_endline "Reading dataset...";
 
-  let clusters =
-    Kmeans.initClusters points 42 2
+  let points, t_read =
+    time (fun () ->
+      CsvReader.readDataset "DATA/datos_ampliado.csv"
+    )
   in
 
-  let iters = ref 0 in
 
-  while Kmeans.hasNotConvergedAll clusters do
-    incr iters;
-    Kmeans.cleanClusters clusters;
+  print_endline "Initializing clusters...";
 
-    Kmeans.assignPointsToClusters points clusters;
+  let clusters =
+    Kmeans.initClusters points seed k
+  in
 
-    Kmeans.updateCentroids clusters;
+  print_endline "Starting K-means iterations...";
 
-    Array.iteri (fun i (cluster : Cluster.t) ->
+  let _, t_kmeans =
+    time (fun () ->
+      let iters = ref 0 in
 
-    Printf.printf
-      "\nCluster %d\n"
-      (i+1);
+      while
+        (Kmeans.hasNotConvergedAll clusters)
+        && (!iters < maxIters)
+      do
+        incr iters;
+        Kmeans.cleanClusters clusters;
+        Kmeans.assignPointsToClusters points clusters;
+        Kmeans.updateCentroids clusters;
 
-    Printf.printf
-      "Centroide: %s\n"
-      (cluster.centroid
-      |> Array.to_list
-      |> List.map string_of_float
-      |> String.concat ", ");
+        if !iters mod 10 = 0 then begin
+          Printf.printf "Iteration %d\n%!" !iters;
+          flush stdout;
+        end
+      done
+    )
+  in
 
-    Printf.printf
-      "Puntos: %d\n"
-      (List.length cluster.points)
+  Printf.printf "Dataset read in %.4f seconds\n%!" t_read;
 
-  ) clusters;
+  Printf.printf "K-means done in %.4f seconds\n%!" t_kmeans;
 
-  Printf.printf "n\n\n\n\n\n";
-
-  done;
-
-  Printf.printf "Converged in %d iterations\n" !iters
-
-  
+  Printf.printf "TOTAL TIME: %.4f seconds\n%!"
+    (t_read +. t_kmeans)

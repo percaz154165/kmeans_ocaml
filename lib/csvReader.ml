@@ -15,12 +15,21 @@ let readDataset filename =
   (try
       while true do
 
-        let values =
-          input_line ic
-          |> String.split_on_char ','
-          |> List.map float_of_string
-          |> Array.of_list
-        in
+        let line = input_line ic in
+
+        let parts = String.split_on_char ',' line in
+
+        let values = Array.make dim 0.0 in
+
+        let k = ref 0 in
+
+        for i = 0 to List.length parts - 1 do
+          let s = String.trim (List.nth parts i) in
+          if s <> "" then begin
+            values.(!k) <- float_of_string s;
+            incr k
+          end
+        done;
 
         points.(!i) <- values;
 
@@ -29,13 +38,14 @@ let readDataset filename =
             mins.(j) <- values.(j);
 
           if values.(j) > maxs.(j) then
-            maxs.(j) <- values.(j);
-          done 
-        done
+            maxs.(j) <- values.(j)
+        done;
 
-        if !i mod 1000000 = 0 then
-          Printf.printf "Read %d points\n" !i
-        
+        if (!i mod 1000000 = 0) then begin
+          Printf.printf "Read %d points\n" !i;
+          flush stdout;
+        end;
+
         incr i
 
       done
