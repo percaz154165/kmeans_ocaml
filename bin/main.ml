@@ -2,21 +2,16 @@ open Kmeans_ocaml
 
 let () =
 
-  let points = [|
-    [|1.0;2.0|];
-    [|1.5;1.8|];
-    [|5.0;8.0|];
-    [|8.0;8.0|];
-    [|1.0;0.6|];
-    [|9.0;11.0|];
-  |]
-  in
+  let points = CsvReader.readDataset "data/dataset.csv" in
 
   let clusters =
     Kmeans.initClusters points 42 2
   in
 
+  let iters = ref 0 in
+
   while Kmeans.hasNotConvergedAll clusters do
+    incr iters;
     Kmeans.cleanClusters clusters;
 
     Kmeans.assignPointsToClusters points clusters;
@@ -45,5 +40,7 @@ let () =
   Printf.printf "n\n\n\n\n\n";
 
   done;
+
+  Printf.printf "Converged in %d iterations\n" !iters
 
   
