@@ -15,7 +15,7 @@ let () =
 
   let points, t_read =
     time (fun () ->
-      CsvReader.readDataset "DATA/datos_ampliado.csv"
+      CsvReaderSerial.readDataset "DATA/datos_ampliado.csv"
     )
   in
 
@@ -28,7 +28,7 @@ let () =
 
   print_endline "Starting K-means iterations...";
 
-  let _, t_kmeans =
+  let iters, t_kmeans =
     time (fun () ->
       let iters = ref 0 in
 
@@ -45,9 +45,11 @@ let () =
           Printf.printf "Iteration %d\n%!" !iters;
           flush stdout;
         end
-      done
+      done;
+      !iters
     )
   in
+  Printf.printf "Used %d iterations\n%!" iters;
 
   Printf.printf "Dataset read in %.4f seconds\n%!" t_read;
 

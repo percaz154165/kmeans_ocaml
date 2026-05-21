@@ -19,4 +19,3 @@ let euclideanDistance p1 p2 =
     acc := !acc +. (d *. d)
   done;
   sqrt !acc
-

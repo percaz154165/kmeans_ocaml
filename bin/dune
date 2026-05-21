@@ -1,4 +1,4 @@
-(executable
- (public_name kmeans_ocaml)
- (name main)
+(executables
+ (names serialMain concorrentMain)
+ (public_names kmeans_serial kmeans_parallel)
  (libraries kmeans_ocaml unix))
