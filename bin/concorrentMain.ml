@@ -9,7 +9,7 @@ let time f =
 let () =
   let seed = 42 in
   let k = 6 in
-  let maxIters = 10000 in
+  let maxIters = 100 in
 
   print_endline "Reading dataset...";
 
