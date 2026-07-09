@@ -84,13 +84,10 @@ let () =
 
         let results = Array.map Domain.join domains in
 
-        (* -------- Merge Matemático -------- *)
         for c = 0 to k - 1 do
-          (* Nos aseguramos de que el global empiece limpio *)
           clusters.(c).count <- 0;
           Array.fill clusters.(c).sum_coords 0 (Array.length clusters.(c).sum_coords) 0.0;
 
-          (* Sumamos los contadores y las coordenadas de cada hilo *)
           for w = 0 to n - 1 do
             let local_cluster = results.(w).(c) in
             
